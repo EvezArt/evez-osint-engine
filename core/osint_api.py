@@ -10,6 +10,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from eye_am_all_seeably import eye_am_all_seeably
 from suspect_matrix import SuspectInferenceEngine, SuspectNode, NetworkEdge, VERSION
 
 PORT = int(os.environ.get('OSINT_PORT', 18791))
@@ -52,6 +53,34 @@ class OSINTHandler(BaseHTTPRequestHandler):
             stats = engine.get_db_stats()
             engine.close()
             self._send_json(200, stats)
+        elif path == '/eye':
+            try:
+                content_len = int(self.headers.get('Content-Length', 0))
+                if content_len > 0:
+                    body = self.rfile.read(content_len)
+                    data = json.loads(body)
+                    evs = data.get('eigenvalues', [])
+                    names = data.get('suspect_names', [])
+                    if not evs:
+                        from suspect_matrix import SuspectInferenceEngine, SuspectNode, NetworkEdge
+                        engine = SuspectInferenceEngine(db_path='none')
+                        for s in data.get('suspects', []):
+                            engine.add_suspect(SuspectNode(**s))
+                        for e in data.get('edges', []):
+                            engine.add_edge(NetworkEdge(**e))
+                        engine.run_full_analysis()
+                        evs = [e.real for e in engine.matrix.eigenvalues]
+                        if not names:
+                            names = [node.name for node in engine.matrix.nodes.values()]
+                    result = eye_am_all_seeably(evs, suspects=True, suspect_names=names)
+                    self._send_json(result)
+                else:
+                    self._send_json({'error': 'POST eigenvalues or suspects+edges to analyze'})
+            except Exception as ex:
+                self._send_json({'error': str(ex)}, 500)
+            return
+
+
         else:
             self._send_json(404, {'error': 'Not found'})
 

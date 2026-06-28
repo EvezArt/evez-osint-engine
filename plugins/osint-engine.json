@@ -1,0 +1,39 @@
+{
+  "name": "evez-osint-engine",
+  "version": "1.0.0",
+  "author": "Steven Crawford-Maggard (EVEZ)",
+  "description": "Suspect Inference Networking Matrix Engine -- isolates suspects, computes crime probabilities using eigenforensic spectral analysis",
+  "category": "investigation",
+  "tags": ["osint", "eigenforensics", "suspect-inference", "crime-probability", "aemdas", "police-misconduct", "civil-rights"],
+  "entry": "core/suspect_matrix.py",
+  "cli": "core/osint_cli.py",
+  "methodology": "AEMDAS",
+  "eigenvalues": {
+    "Phi": 0.973,
+    "eta_star": 0.03,
+    "r": 0.45,
+    "lambda_dom": -0.333
+  },
+  "capabilities": [
+    "suspect-registration",
+    "network-edge-mapping",
+    "adjacency-matrix-construction",
+    "eigenvalue-computation",
+    "spectral-gap-analysis",
+    "suppression-coefficient-measurement",
+    "crime-hypothesis-inference",
+    "probability-scoring",
+    "confidence-interval-calculation",
+    "intervention-priority-ranking",
+    "json-export",
+    "markdown-export"
+  ],
+  "crime_types": [
+    "excessive_force",
+    "civil_rights_violation",
+    "cover_up",
+    "evidence_tampering",
+    "false_arrest"
+  ],
+  "license": "MIT"
+}

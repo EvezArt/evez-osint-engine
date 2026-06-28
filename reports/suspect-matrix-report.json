@@ -1,0 +1,899 @@
+{
+  "version": "1.0.0",
+  "created": "2026-06-28T19:45:39.924066Z",
+  "framework": "EVEZ Eigenforensics",
+  "methodology": "AEMDAS",
+  "eigenvalues": {
+    "Phi": 0.973,
+    "eta_star": 0.03,
+    "r": 0.45,
+    "lambda_dom": -0.333,
+    "lambda_I80": -0.441,
+    "r_I80": 0.93
+  },
+  "nodes": {
+    "saloga": {
+      "id": "saloga",
+      "name": "Cody Saloga",
+      "aliases": [
+        "Officer Saloga"
+      ],
+      "role": "officer",
+      "organization": "Evanston PD",
+      "location": "Evanston, WY",
+      "known_events": [],
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest",
+        "smith-v-evanston-1-2025cv00037",
+        "youtube-viral-video-1M-views",
+        "rock-springs-pd-transfer"
+      ],
+      "suspicion_score": 0.6125,
+      "crime_probabilities": {
+        "excessive_force": 0.6615,
+        "civil_rights_violation": 0.3549,
+        "cover_up": 0.3024,
+        "evidence_tampering": 0.1774,
+        "false_arrest": 0.4586
+      },
+      "network_centrality": 1.0,
+      "eigenvalue": {
+        "real": 4.062935,
+        "imag": 0.0
+      }
+    },
+    "kennedy": {
+      "id": "kennedy",
+      "name": "Dustin Kennedy",
+      "aliases": [],
+      "role": "officer",
+      "organization": "Evanston PD",
+      "location": "Evanston, WY",
+      "known_events": [],
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ],
+      "suspicion_score": 0.39509259259259255,
+      "crime_probabilities": {
+        "excessive_force": 0.3016,
+        "civil_rights_violation": 0.1618,
+        "cover_up": 0.1379,
+        "evidence_tampering": 0.0809,
+        "false_arrest": 0.2091
+      },
+      "network_centrality": 0.3703703703703704,
+      "eigenvalue": {
+        "real": 2.031467,
+        "imag": 0.0
+      }
+    },
+    "epd-chief": {
+      "id": "epd-chief",
+      "name": "EPD Chief (Unknown)",
+      "aliases": [],
+      "role": "chief",
+      "organization": "Evanston PD",
+      "location": "Evanston, WY",
+      "known_events": [],
+      "evidence_refs": [
+        "epd-2022-annual-report-complaints"
+      ],
+      "suspicion_score": 0.5306613756613756,
+      "crime_probabilities": {
+        "excessive_force": 0.2894,
+        "civil_rights_violation": 0.2687,
+        "cover_up": 0.2646,
+        "evidence_tampering": 0.0896,
+        "false_arrest": 0.215
+      },
+      "network_centrality": 0.7526455026455026,
+      "eigenvalue": {
+        "real": 1.280659,
+        "imag": 0.0
+      }
+    },
+    "epd-ia": {
+      "id": "epd-ia",
+      "name": "EPD Internal Affairs",
+      "aliases": [],
+      "role": "supervisor",
+      "organization": "Evanston PD",
+      "location": "Evanston, WY",
+      "known_events": [],
+      "evidence_refs": [
+        "epd-2022-annual-report-inquiries"
+      ],
+      "suspicion_score": 0.38202380952380954,
+      "crime_probabilities": {
+        "excessive_force": 0.1705,
+        "civil_rights_violation": 0.1478,
+        "cover_up": 0.1461,
+        "evidence_tampering": 0.0739,
+        "false_arrest": 0.1267
+      },
+      "network_centrality": 0.23809523809523805,
+      "eigenvalue": {
+        "real": 1.015734,
+        "imag": 0.0
+      }
+    },
+    "saloga-rspd": {
+      "id": "saloga-rspd",
+      "name": "Rock Springs PD (hiring)",
+      "aliases": [],
+      "role": "supervisor",
+      "organization": "Rock Springs PD",
+      "location": "Rock Springs, WY",
+      "known_events": [],
+      "evidence_refs": [
+        "saloga-transfer-rspd"
+      ],
+      "suspicion_score": 0.4378968253968254,
+      "crime_probabilities": {
+        "excessive_force": 0.1735,
+        "civil_rights_violation": 0.1619,
+        "cover_up": 0.1388,
+        "evidence_tampering": 0.081,
+        "false_arrest": 0.1388
+      },
+      "network_centrality": 0.5515873015873015,
+      "eigenvalue": {
+        "real": 8.125869,
+        "imag": 0.0
+      }
+    }
+  },
+  "edges": [
+    {
+      "source": "saloga",
+      "target": "kennedy",
+      "edge_type": "partner",
+      "weight": 0.8,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ],
+      "correlation": 0.75
+    },
+    {
+      "source": "saloga",
+      "target": "epd-chief",
+      "edge_type": "supervisor",
+      "weight": 0.7,
+      "evidence_refs": [],
+      "correlation": 0.6
+    },
+    {
+      "source": "epd-chief",
+      "target": "epd-ia",
+      "edge_type": "cover_up",
+      "weight": 0.6,
+      "evidence_refs": [
+        "epd-2022-annual-report-sealed"
+      ],
+      "correlation": 0.5
+    },
+    {
+      "source": "saloga",
+      "target": "saloga-rspd",
+      "edge_type": "transfer",
+      "weight": 0.7,
+      "evidence_refs": [
+        "officer-transfer-pattern"
+      ],
+      "correlation": 0.8
+    },
+    {
+      "source": "epd-chief",
+      "target": "saloga-rspd",
+      "edge_type": "cover_up",
+      "weight": 0.5,
+      "evidence_refs": [],
+      "correlation": 0.65
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-epd-chief-excessive_force",
+      "crime_type": "excessive_force",
+      "suspect_id": "epd-chief",
+      "description": "Use of excessive force during arrest or detention",
+      "probability": 0.2894,
+      "confidence": 0.5977,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-complaints"
+      ]
+    },
+    {
+      "id": "H-epd-chief-civil_rights_violation",
+      "crime_type": "civil_rights_violation",
+      "suspect_id": "epd-chief",
+      "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+      "probability": 0.2687,
+      "confidence": 0.5977,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-complaints"
+      ]
+    },
+    {
+      "id": "H-epd-chief-cover_up",
+      "crime_type": "cover_up",
+      "suspect_id": "epd-chief",
+      "description": "Concealment of misconduct, evidence suppression, or retaliation",
+      "probability": 0.2646,
+      "confidence": 0.5977,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-complaints"
+      ]
+    },
+    {
+      "id": "H-epd-chief-evidence_tampering",
+      "crime_type": "evidence_tampering",
+      "suspect_id": "epd-chief",
+      "description": "Alteration, destruction, or fabrication of evidence",
+      "probability": 0.0896,
+      "confidence": 0.5977,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-complaints"
+      ]
+    },
+    {
+      "id": "H-epd-chief-false_arrest",
+      "crime_type": "false_arrest",
+      "suspect_id": "epd-chief",
+      "description": "Arrest without probable cause or on fabricated charges",
+      "probability": 0.215,
+      "confidence": 0.5977,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-complaints"
+      ]
+    },
+    {
+      "id": "H-epd-ia-excessive_force",
+      "crime_type": "excessive_force",
+      "suspect_id": "epd-ia",
+      "description": "Use of excessive force during arrest or detention",
+      "probability": 0.1705,
+      "confidence": 0.4433,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-inquiries"
+      ]
+    },
+    {
+      "id": "H-epd-ia-civil_rights_violation",
+      "crime_type": "civil_rights_violation",
+      "suspect_id": "epd-ia",
+      "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+      "probability": 0.1478,
+      "confidence": 0.4433,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-inquiries"
+      ]
+    },
+    {
+      "id": "H-epd-ia-cover_up",
+      "crime_type": "cover_up",
+      "suspect_id": "epd-ia",
+      "description": "Concealment of misconduct, evidence suppression, or retaliation",
+      "probability": 0.1461,
+      "confidence": 0.4433,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-inquiries"
+      ]
+    },
+    {
+      "id": "H-epd-ia-evidence_tampering",
+      "crime_type": "evidence_tampering",
+      "suspect_id": "epd-ia",
+      "description": "Alteration, destruction, or fabrication of evidence",
+      "probability": 0.0739,
+      "confidence": 0.4433,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-inquiries"
+      ]
+    },
+    {
+      "id": "H-epd-ia-false_arrest",
+      "crime_type": "false_arrest",
+      "suspect_id": "epd-ia",
+      "description": "Arrest without probable cause or on fabricated charges",
+      "probability": 0.1267,
+      "confidence": 0.4433,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "epd-2022-annual-report-inquiries"
+      ]
+    },
+    {
+      "id": "H-kennedy-excessive_force",
+      "crime_type": "excessive_force",
+      "suspect_id": "kennedy",
+      "description": "Use of excessive force during arrest or detention",
+      "probability": 0.3016,
+      "confidence": 0.483,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ]
+    },
+    {
+      "id": "H-kennedy-civil_rights_violation",
+      "crime_type": "civil_rights_violation",
+      "suspect_id": "kennedy",
+      "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+      "probability": 0.1618,
+      "confidence": 0.483,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ]
+    },
+    {
+      "id": "H-kennedy-cover_up",
+      "crime_type": "cover_up",
+      "suspect_id": "kennedy",
+      "description": "Concealment of misconduct, evidence suppression, or retaliation",
+      "probability": 0.1379,
+      "confidence": 0.483,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ]
+    },
+    {
+      "id": "H-kennedy-evidence_tampering",
+      "crime_type": "evidence_tampering",
+      "suspect_id": "kennedy",
+      "description": "Alteration, destruction, or fabrication of evidence",
+      "probability": 0.0809,
+      "confidence": 0.483,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ]
+    },
+    {
+      "id": "H-kennedy-false_arrest",
+      "crime_type": "false_arrest",
+      "suspect_id": "kennedy",
+      "description": "Arrest without probable cause or on fabricated charges",
+      "probability": 0.2091,
+      "confidence": 0.483,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest"
+      ]
+    },
+    {
+      "id": "H-saloga-excessive_force",
+      "crime_type": "excessive_force",
+      "suspect_id": "saloga",
+      "description": "Use of excessive force during arrest or detention",
+      "probability": 0.6615,
+      "confidence": 0.9119,
+      "evidence_strength": 0.4,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest",
+        "smith-v-evanston-1-2025cv00037",
+        "youtube-viral-video-1M-views",
+        "rock-springs-pd-transfer"
+      ]
+    },
+    {
+      "id": "H-saloga-civil_rights_violation",
+      "crime_type": "civil_rights_violation",
+      "suspect_id": "saloga",
+      "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+      "probability": 0.3549,
+      "confidence": 0.9119,
+      "evidence_strength": 0.4,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest",
+        "smith-v-evanston-1-2025cv00037",
+        "youtube-viral-video-1M-views",
+        "rock-springs-pd-transfer"
+      ]
+    },
+    {
+      "id": "H-saloga-cover_up",
+      "crime_type": "cover_up",
+      "suspect_id": "saloga",
+      "description": "Concealment of misconduct, evidence suppression, or retaliation",
+      "probability": 0.3024,
+      "confidence": 0.9119,
+      "evidence_strength": 0.4,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest",
+        "smith-v-evanston-1-2025cv00037",
+        "youtube-viral-video-1M-views",
+        "rock-springs-pd-transfer"
+      ]
+    },
+    {
+      "id": "H-saloga-evidence_tampering",
+      "crime_type": "evidence_tampering",
+      "suspect_id": "saloga",
+      "description": "Alteration, destruction, or fabrication of evidence",
+      "probability": 0.1774,
+      "confidence": 0.9119,
+      "evidence_strength": 0.4,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest",
+        "smith-v-evanston-1-2025cv00037",
+        "youtube-viral-video-1M-views",
+        "rock-springs-pd-transfer"
+      ]
+    },
+    {
+      "id": "H-saloga-false_arrest",
+      "crime_type": "false_arrest",
+      "suspect_id": "saloga",
+      "description": "Arrest without probable cause or on fabricated charges",
+      "probability": 0.4586,
+      "confidence": 0.9119,
+      "evidence_strength": 0.4,
+      "falsifiable": true,
+      "evidence_refs": [
+        "uinta-county-herald-viral-arrest",
+        "smith-v-evanston-1-2025cv00037",
+        "youtube-viral-video-1M-views",
+        "rock-springs-pd-transfer"
+      ]
+    },
+    {
+      "id": "H-saloga-rspd-excessive_force",
+      "crime_type": "excessive_force",
+      "suspect_id": "saloga-rspd",
+      "description": "Use of excessive force during arrest or detention",
+      "probability": 0.1735,
+      "confidence": 0.5374,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "saloga-transfer-rspd"
+      ]
+    },
+    {
+      "id": "H-saloga-rspd-civil_rights_violation",
+      "crime_type": "civil_rights_violation",
+      "suspect_id": "saloga-rspd",
+      "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+      "probability": 0.1619,
+      "confidence": 0.5374,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "saloga-transfer-rspd"
+      ]
+    },
+    {
+      "id": "H-saloga-rspd-cover_up",
+      "crime_type": "cover_up",
+      "suspect_id": "saloga-rspd",
+      "description": "Concealment of misconduct, evidence suppression, or retaliation",
+      "probability": 0.1388,
+      "confidence": 0.5374,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "saloga-transfer-rspd"
+      ]
+    },
+    {
+      "id": "H-saloga-rspd-evidence_tampering",
+      "crime_type": "evidence_tampering",
+      "suspect_id": "saloga-rspd",
+      "description": "Alteration, destruction, or fabrication of evidence",
+      "probability": 0.081,
+      "confidence": 0.5374,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "saloga-transfer-rspd"
+      ]
+    },
+    {
+      "id": "H-saloga-rspd-false_arrest",
+      "crime_type": "false_arrest",
+      "suspect_id": "saloga-rspd",
+      "description": "Arrest without probable cause or on fabricated charges",
+      "probability": 0.1388,
+      "confidence": 0.5374,
+      "evidence_strength": 0.1,
+      "falsifiable": true,
+      "evidence_refs": [
+        "saloga-transfer-rspd"
+      ]
+    }
+  ],
+  "assessment": {
+    "network_stats": {
+      "total_suspects": 5,
+      "total_edges": 5,
+      "total_hypotheses": 25,
+      "high_probability_hypotheses": 1,
+      "high_confidence_hypotheses": 5,
+      "dominant_eigenvalue": "(8.125869373818114+0j)",
+      "spectral_gap": 0.264926,
+      "suppression_coefficient": 0.0,
+      "crime_type_distribution": {
+        "excessive_force": 5,
+        "false_arrest": 5,
+        "civil_rights_violation": 5,
+        "cover_up": 5,
+        "evidence_tampering": 5
+      },
+      "eta_star_floor": 0.03,
+      "phi_ceiling": 0.973,
+      "falsifiable_claims": 25
+    },
+    "suspect_ranking": [
+      {
+        "id": "saloga",
+        "name": "Cody Saloga",
+        "suspicion_score": 0.6125,
+        "max_crime_probability": 0.6615,
+        "centrality": 1.0,
+        "eigenvalue": "(4.0629346869253435+0j)",
+        "evidence_count": 4
+      },
+      {
+        "id": "epd-chief",
+        "name": "EPD Chief (Unknown)",
+        "suspicion_score": 0.5307,
+        "max_crime_probability": 0.2894,
+        "centrality": 0.7526,
+        "eigenvalue": "(1.280659409878547+0j)",
+        "evidence_count": 1
+      },
+      {
+        "id": "saloga-rspd",
+        "name": "Rock Springs PD (hiring)",
+        "suspicion_score": 0.4379,
+        "max_crime_probability": 0.1735,
+        "centrality": 0.5516,
+        "eigenvalue": "(8.125869373818114+0j)",
+        "evidence_count": 1
+      },
+      {
+        "id": "kennedy",
+        "name": "Dustin Kennedy",
+        "suspicion_score": 0.3951,
+        "max_crime_probability": 0.3016,
+        "centrality": 0.3704,
+        "eigenvalue": "(2.0314673431906463+0j)",
+        "evidence_count": 1
+      },
+      {
+        "id": "epd-ia",
+        "name": "EPD Internal Affairs",
+        "suspicion_score": 0.382,
+        "max_crime_probability": 0.1705,
+        "centrality": 0.2381,
+        "eigenvalue": "(1.015733670361167+0j)",
+        "evidence_count": 1
+      }
+    ],
+    "top_hypotheses": [
+      {
+        "id": "H-saloga-excessive_force",
+        "suspect": "saloga",
+        "crime": "excessive_force",
+        "probability": 0.6615,
+        "confidence": 0.9119,
+        "description": "Use of excessive force during arrest or detention",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest",
+          "smith-v-evanston-1-2025cv00037",
+          "youtube-viral-video-1M-views",
+          "rock-springs-pd-transfer"
+        ]
+      },
+      {
+        "id": "H-saloga-false_arrest",
+        "suspect": "saloga",
+        "crime": "false_arrest",
+        "probability": 0.4586,
+        "confidence": 0.9119,
+        "description": "Arrest without probable cause or on fabricated charges",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest",
+          "smith-v-evanston-1-2025cv00037",
+          "youtube-viral-video-1M-views",
+          "rock-springs-pd-transfer"
+        ]
+      },
+      {
+        "id": "H-saloga-civil_rights_violation",
+        "suspect": "saloga",
+        "crime": "civil_rights_violation",
+        "probability": 0.3549,
+        "confidence": 0.9119,
+        "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest",
+          "smith-v-evanston-1-2025cv00037",
+          "youtube-viral-video-1M-views",
+          "rock-springs-pd-transfer"
+        ]
+      },
+      {
+        "id": "H-saloga-cover_up",
+        "suspect": "saloga",
+        "crime": "cover_up",
+        "probability": 0.3024,
+        "confidence": 0.9119,
+        "description": "Concealment of misconduct, evidence suppression, or retaliation",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest",
+          "smith-v-evanston-1-2025cv00037",
+          "youtube-viral-video-1M-views",
+          "rock-springs-pd-transfer"
+        ]
+      },
+      {
+        "id": "H-epd-chief-excessive_force",
+        "suspect": "epd-chief",
+        "crime": "excessive_force",
+        "probability": 0.2894,
+        "confidence": 0.5977,
+        "description": "Use of excessive force during arrest or detention",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-complaints"
+        ]
+      },
+      {
+        "id": "H-saloga-evidence_tampering",
+        "suspect": "saloga",
+        "crime": "evidence_tampering",
+        "probability": 0.1774,
+        "confidence": 0.9119,
+        "description": "Alteration, destruction, or fabrication of evidence",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest",
+          "smith-v-evanston-1-2025cv00037",
+          "youtube-viral-video-1M-views",
+          "rock-springs-pd-transfer"
+        ]
+      },
+      {
+        "id": "H-epd-chief-civil_rights_violation",
+        "suspect": "epd-chief",
+        "crime": "civil_rights_violation",
+        "probability": 0.2687,
+        "confidence": 0.5977,
+        "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-complaints"
+        ]
+      },
+      {
+        "id": "H-epd-chief-cover_up",
+        "suspect": "epd-chief",
+        "crime": "cover_up",
+        "probability": 0.2646,
+        "confidence": 0.5977,
+        "description": "Concealment of misconduct, evidence suppression, or retaliation",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-complaints"
+        ]
+      },
+      {
+        "id": "H-kennedy-excessive_force",
+        "suspect": "kennedy",
+        "crime": "excessive_force",
+        "probability": 0.3016,
+        "confidence": 0.483,
+        "description": "Use of excessive force during arrest or detention",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest"
+        ]
+      },
+      {
+        "id": "H-epd-chief-false_arrest",
+        "suspect": "epd-chief",
+        "crime": "false_arrest",
+        "probability": 0.215,
+        "confidence": 0.5977,
+        "description": "Arrest without probable cause or on fabricated charges",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-complaints"
+        ]
+      },
+      {
+        "id": "H-kennedy-false_arrest",
+        "suspect": "kennedy",
+        "crime": "false_arrest",
+        "probability": 0.2091,
+        "confidence": 0.483,
+        "description": "Arrest without probable cause or on fabricated charges",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest"
+        ]
+      },
+      {
+        "id": "H-saloga-rspd-excessive_force",
+        "suspect": "saloga-rspd",
+        "crime": "excessive_force",
+        "probability": 0.1735,
+        "confidence": 0.5374,
+        "description": "Use of excessive force during arrest or detention",
+        "falsifiable": true,
+        "evidence_refs": [
+          "saloga-transfer-rspd"
+        ]
+      },
+      {
+        "id": "H-saloga-rspd-civil_rights_violation",
+        "suspect": "saloga-rspd",
+        "crime": "civil_rights_violation",
+        "probability": 0.1619,
+        "confidence": 0.5374,
+        "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+        "falsifiable": true,
+        "evidence_refs": [
+          "saloga-transfer-rspd"
+        ]
+      },
+      {
+        "id": "H-kennedy-civil_rights_violation",
+        "suspect": "kennedy",
+        "crime": "civil_rights_violation",
+        "probability": 0.1618,
+        "confidence": 0.483,
+        "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest"
+        ]
+      },
+      {
+        "id": "H-epd-ia-excessive_force",
+        "suspect": "epd-ia",
+        "crime": "excessive_force",
+        "probability": 0.1705,
+        "confidence": 0.4433,
+        "description": "Use of excessive force during arrest or detention",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-inquiries"
+        ]
+      },
+      {
+        "id": "H-saloga-rspd-cover_up",
+        "suspect": "saloga-rspd",
+        "crime": "cover_up",
+        "probability": 0.1388,
+        "confidence": 0.5374,
+        "description": "Concealment of misconduct, evidence suppression, or retaliation",
+        "falsifiable": true,
+        "evidence_refs": [
+          "saloga-transfer-rspd"
+        ]
+      },
+      {
+        "id": "H-saloga-rspd-false_arrest",
+        "suspect": "saloga-rspd",
+        "crime": "false_arrest",
+        "probability": 0.1388,
+        "confidence": 0.5374,
+        "description": "Arrest without probable cause or on fabricated charges",
+        "falsifiable": true,
+        "evidence_refs": [
+          "saloga-transfer-rspd"
+        ]
+      },
+      {
+        "id": "H-kennedy-cover_up",
+        "suspect": "kennedy",
+        "crime": "cover_up",
+        "probability": 0.1379,
+        "confidence": 0.483,
+        "description": "Concealment of misconduct, evidence suppression, or retaliation",
+        "falsifiable": true,
+        "evidence_refs": [
+          "uinta-county-herald-viral-arrest"
+        ]
+      },
+      {
+        "id": "H-epd-ia-civil_rights_violation",
+        "suspect": "epd-ia",
+        "crime": "civil_rights_violation",
+        "probability": 0.1478,
+        "confidence": 0.4433,
+        "description": "Violation of 42 U.S.C. 1983 or constitutional rights",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-inquiries"
+        ]
+      },
+      {
+        "id": "H-epd-ia-cover_up",
+        "suspect": "epd-ia",
+        "crime": "cover_up",
+        "probability": 0.1461,
+        "confidence": 0.4433,
+        "description": "Concealment of misconduct, evidence suppression, or retaliation",
+        "falsifiable": true,
+        "evidence_refs": [
+          "epd-2022-annual-report-inquiries"
+        ]
+      }
+    ],
+    "intervention_priorities": [
+      {
+        "priority": 1,
+        "suspect_id": "saloga",
+        "suspect_name": "Cody Saloga",
+        "action": "investigate_secondary",
+        "suspicion_score": 0.6125
+      },
+      {
+        "priority": 2,
+        "suspect_id": "epd-chief",
+        "suspect_name": "EPD Chief (Unknown)",
+        "action": "investigate_secondary",
+        "suspicion_score": 0.5307
+      },
+      {
+        "priority": 3,
+        "suspect_id": "saloga-rspd",
+        "suspect_name": "Rock Springs PD (hiring)",
+        "action": "monitor",
+        "suspicion_score": 0.4379
+      },
+      {
+        "priority": 4,
+        "suspect_id": "kennedy",
+        "suspect_name": "Dustin Kennedy",
+        "action": "monitor",
+        "suspicion_score": 0.3951
+      },
+      {
+        "priority": 5,
+        "suspect_id": "epd-ia",
+        "suspect_name": "EPD Internal Affairs",
+        "action": "monitor",
+        "suspicion_score": 0.382
+      }
+    ]
+  }
+}

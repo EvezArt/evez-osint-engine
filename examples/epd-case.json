@@ -1,0 +1,16 @@
+{
+  "suspects": [
+    {"id": "saloga", "name": "Cody Saloga", "role": "officer", "organization": "Evanston PD", "location": "Evanston, WY", "evidence_refs": ["uinta-county-herald-viral-arrest", "smith-v-evanston-1-2025cv00037", "youtube-viral-video-1M-views", "rock-springs-pd-transfer"]},
+    {"id": "kennedy", "name": "Dustin Kennedy", "role": "officer", "organization": "Evanston PD", "location": "Evanston, WY", "evidence_refs": ["uinta-county-herald-viral-arrest"]},
+    {"id": "epd-chief", "name": "EPD Chief", "role": "chief", "organization": "Evanston PD", "location": "Evanston, WY", "evidence_refs": ["epd-2022-annual-report-complaints"]},
+    {"id": "epd-ia", "name": "EPD Internal Affairs", "role": "supervisor", "organization": "Evanston PD", "location": "Evanston, WY", "evidence_refs": ["epd-2022-annual-report-inquiries"]},
+    {"id": "rspd-hiring", "name": "Rock Springs PD", "role": "supervisor", "organization": "Rock Springs PD", "location": "Rock Springs, WY", "evidence_refs": ["saloga-transfer-rspd"]}
+  ],
+  "edges": [
+    {"source": "saloga", "target": "kennedy", "edge_type": "partner", "weight": 0.8, "correlation": 0.75},
+    {"source": "saloga", "target": "epd-chief", "edge_type": "supervisor", "weight": 0.7, "correlation": 0.60},
+    {"source": "epd-chief", "target": "epd-ia", "edge_type": "cover_up", "weight": 0.6, "correlation": 0.50},
+    {"source": "saloga", "target": "rspd-hiring", "edge_type": "transfer", "weight": 0.7, "correlation": 0.80},
+    {"source": "epd-chief", "target": "rspd-hiring", "edge_type": "cover_up", "weight": 0.5, "correlation": 0.65}
+  ]
+}

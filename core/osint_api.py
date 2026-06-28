@@ -88,6 +88,16 @@ class OSINTHandler(BaseHTTPRequestHandler):
         else:
             self._send_json(404, {'error': 'Not found'})
 
+    def do_HEAD(self):
+        parsed = urlparse(self.path)
+        if parsed.path in ('/', '/health', '/stats'):
+            self.send_response(200)
+        else:
+            self.send_response(404)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')

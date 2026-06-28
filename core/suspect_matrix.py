@@ -24,6 +24,11 @@ from datetime import datetime
 from collections import defaultdict
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field, asdict
+# Eye of Ra Triad imports
+from cyclops_lazer import cyclops_lazer
+from ra_focusing import ra_focusing  
+from horus_opening import horus_opening
+from eye_am_all_seeably import eye_am_all_seeably
 
 # ============================================================
 # EIGENVALUE CONSTANTS
@@ -367,6 +372,21 @@ class SuspectInferenceEngine:
             ))
             node.crime_probabilities[crime_type] = round(prob, 4)
 
+
+    def eye_pipeline(self, suspect_names=None):
+        """Run the Eye of Ra Triad + EyeAmAllSeeably unified pipeline.
+        
+        Returns the complete spectral analysis from all four eyes.
+        """
+        eigenvalues = [e for e in self.eigenvalues]
+        if not eigenvalues:
+            return {'error': 'No eigenvalues computed. Run analyze() first.'}
+        
+        if suspect_names is None:
+            suspect_names = [s.get('name', f'Suspect-{i}') for i, s in enumerate(self.suspects)]
+        
+        return eye_am_all_seeably(eigenvalues, suspects=True, suspect_names=suspect_names)
+    
     def run_full_analysis(self):
         """Run the complete AEMDAS pipeline."""
         self.build_adjacency()

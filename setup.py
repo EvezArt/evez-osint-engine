@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name='evez-osint',
-    version='1.0.0',
+    version='1.1.0',
     author='Steven Crawford-Maggard (EVEZ)',
     author_email='fiersteity@gmail.com',
     description='Suspect Inference Networking Matrix Engine -- eigenforensic OSINT analysis',

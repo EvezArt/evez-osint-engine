@@ -1,33 +1,46 @@
 #!/usr/bin/env python3
 """
-EVEZ OSINT Suspect Inference Matrix Engine
-==========================================
+EVEZ OSINT Suspect Inference Matrix Engine v1.1.0
+=================================================
 Isolates and identifies suspect inference networking matrices.
 Computes statistical probabilities of likely crimes using
-eigenforensic spectral analysis.
+eigenforensic spectral analysis. Collects anonymous usage data.
 
 AEMDAS: Assert Being -> Extract Structure -> Measure Gaps ->
         Deduce Laws -> Assess Interventions -> Speedrun
 
 Author: Steven Crawford-Maggard (EVEZ)
 License: MIT
-Version: 1.0.0
+Version: 1.1.0
 """
 
 import json
 import math
 import os
+import time
+import hashlib
+import sqlite3
 from datetime import datetime
 from collections import defaultdict
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field, asdict
 
+# ============================================================
+# EIGENVALUE CONSTANTS
+# ============================================================
 PHI = 0.973
 ETA_STAR = 0.03
 R_CRITICAL = 0.45
 LAMBDA_DOM = -0.333
 LAMBDA_I80 = -0.441
 R_I80 = 0.93
+SCHUMANN = 7.83
+
+VERSION = '1.1.0'
+
+# ============================================================
+# DATA CLASSES
+# ============================================================
 
 @dataclass
 class SuspectNode:
@@ -76,14 +89,145 @@ class InferenceMatrix:
     spectral_gap: float = 0.0
     suppression_coefficient: float = 0.0
     created: str = ""
-    version: str = "1.0.0"
+    version: str = VERSION
+
+# ============================================================
+# DATABASE — Anonymous usage collection
+# ============================================================
+
+class UsageDB:
+    """SQLite database for collecting anonymous usage statistics."""
+    def __init__(self, db_path=None):
+        if db_path is None:
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'osint_usage.db')
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        self.db_path = db_path
+        self.conn = sqlite3.connect(db_path)
+        self._init_schema()
+
+    def _init_schema(self):
+        c = self.conn.cursor()
+        c.executescript('''
+            CREATE TABLE IF NOT EXISTS sessions (
+                id TEXT PRIMARY KEY,
+                timestamp TEXT NOT NULL,
+                suspect_count INTEGER DEFAULT 0,
+                edge_count INTEGER DEFAULT 0,
+                hypothesis_count INTEGER DEFAULT 0,
+                high_prob_count INTEGER DEFAULT 0,
+                dominant_eigenvalue REAL DEFAULT 0,
+                spectral_gap REAL DEFAULT 0,
+                suppression_coefficient REAL DEFAULT 0,
+                top_suspicion REAL DEFAULT 0,
+                top_crime_type TEXT DEFAULT '',
+                top_probability REAL DEFAULT 0,
+                run_time_ms INTEGER DEFAULT 0,
+                version TEXT DEFAULT ''
+            );
+            CREATE TABLE IF NOT EXISTS suspects (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                suspect_name TEXT DEFAULT '',
+                role TEXT DEFAULT '',
+                organization TEXT DEFAULT '',
+                suspicion_score REAL DEFAULT 0,
+                top_crime TEXT DEFAULT '',
+                top_probability REAL DEFAULT 0,
+                evidence_count INTEGER DEFAULT 0,
+                timestamp TEXT NOT NULL,
+                FOREIGN KEY (session_id) REFERENCES sessions(id)
+            );
+            CREATE TABLE IF NOT EXISTS hypotheses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                suspect_name TEXT DEFAULT '',
+                crime_type TEXT DEFAULT '',
+                probability REAL DEFAULT 0,
+                confidence REAL DEFAULT 0,
+                timestamp TEXT NOT NULL,
+                FOREIGN KEY (session_id) REFERENCES sessions(id)
+            );
+            CREATE TABLE IF NOT EXISTS stats (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+        ''')
+        self.conn.commit()
+
+    def log_session(self, engine, run_time_ms=0):
+        """Log an analysis session anonymously."""
+        session_id = hashlib.sha256(f"{time.time()}{engine.matrix.created}".encode()).hexdigest()[:16]
+        ts = datetime.utcnow().isoformat() + "Z"
+        assessment = engine.assess_interventions()
+        stats = assessment['network_stats']
+        top = assessment['suspect_ranking'][0] if assessment['suspect_ranking'] else None
+
+        c = self.conn.cursor()
+        top_crime = ''
+        top_prob = 0.0
+        if top:
+            top_prob = top.get('max_crime_probability', 0)
+            node = engine.matrix.nodes.get(top['id'])
+            if node and node.crime_probabilities:
+                top_crime = max(node.crime_probabilities, key=node.crime_probabilities.get)
+        c.execute('INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            (session_id, ts, stats['total_suspects'], stats['total_edges'],
+             stats['total_hypotheses'], stats['high_probability_hypotheses'],
+             engine.matrix.dominant_eigenvalue.real if engine.matrix.eigenvalues else 0,
+             engine.matrix.spectral_gap, engine.matrix.suppression_coefficient,
+             top['suspicion_score'] if top else 0,
+             top_crime, top_prob, run_time_ms, VERSION))
+
+        for s in assessment['suspect_ranking']:
+            node = engine.matrix.nodes.get(s['id'])
+            top_crime = max(node.crime_probabilities, key=node.crime_probabilities.get) if node and node.crime_probabilities else ''
+            top_prob = max(node.crime_probabilities.values()) if node and node.crime_probabilities else 0
+            c.execute('INSERT INTO suspects (session_id,suspect_name,role,organization,suspicion_score,top_crime,top_probability,evidence_count,timestamp) VALUES (?,?,?,?,?,?,?,?,?)',
+                (session_id, s['name'], node.role if node else '', node.organization if node else '',
+                 s['suspicion_score'], top_crime, top_prob, s['evidence_count'], ts))
+
+        for h in assessment['top_hypotheses']:
+            c.execute('INSERT INTO hypotheses (session_id,suspect_name,crime_type,probability,confidence,timestamp) VALUES (?,?,?,?,?,?)',
+                (session_id, h.get('suspect',''), h['crime'], h['probability'], h['confidence'], ts))
+
+        self.conn.commit()
+        return session_id
+
+    def get_stats(self):
+        """Get aggregate statistics."""
+        c = self.conn.cursor()
+        stats = {}
+        c.execute('SELECT COUNT(*) FROM sessions')
+        stats['total_sessions'] = c.fetchone()[0]
+        c.execute('SELECT COUNT(*) FROM suspects')
+        stats['total_suspects_logged'] = c.fetchone()[0]
+        c.execute('SELECT COUNT(*) FROM hypotheses')
+        stats['total_hypotheses_logged'] = c.fetchone()[0]
+        c.execute('SELECT AVG(suspicion_score) FROM suspects')
+        stats['avg_suspicion'] = round(c.fetchone()[0] or 0, 4)
+        c.execute('SELECT crime_type, COUNT(*) as cnt, AVG(probability) as avg_prob FROM hypotheses GROUP BY crime_type ORDER BY cnt DESC')
+        stats['crime_distribution'] = {row[0]: {'count': row[1], 'avg_prob': round(row[2],4)} for row in c.fetchall()}
+        c.execute('SELECT suspect_name, COUNT(*) as cnt FROM suspects GROUP BY suspect_name ORDER BY cnt DESC LIMIT 10')
+        stats['top_suspects'] = [{'name': row[0], 'appearances': row[1]} for row in c.fetchall()]
+        c.execute('SELECT organization, COUNT(*) as cnt FROM suspects WHERE organization != "" GROUP BY organization ORDER BY cnt DESC LIMIT 10')
+        stats['top_organizations'] = [{'org': row[0], 'appearances': row[1]} for row in c.fetchall()]
+        return stats
+
+    def close(self):
+        self.conn.close()
+
+# ============================================================
+# CORE ENGINE — AEMDAS Pipeline
+# ============================================================
 
 class SuspectInferenceEngine:
-    def __init__(self):
+    def __init__(self, db_path=None):
         self.matrix = InferenceMatrix()
         self.matrix.created = datetime.utcnow().isoformat() + "Z"
         self._node_ids = []
         self._idx = {}
+        self.db = UsageDB(db_path) if db_path != 'none' else None
+        self._start_time = time.time()
 
     def add_suspect(self, node):
         self.matrix.nodes[node.id] = node
@@ -94,6 +238,7 @@ class SuspectInferenceEngine:
     def build_adjacency(self):
         n = len(self.matrix.nodes)
         if n == 0:
+            self.matrix.adjacency = []
             return
         self._node_ids = sorted(self.matrix.nodes.keys())
         self._idx = {nid: i for i, nid in enumerate(self._node_ids)}
@@ -162,10 +307,12 @@ class SuspectInferenceEngine:
         if self.matrix.adjacency is None:
             self.build_adjacency()
         n = len(self._node_ids)
+        if n == 0:
+            return
         centrality = [0.0]*n
         for i in range(n):
             centrality[i] = sum(self.matrix.adjacency[i][j] for j in range(n))
-        max_c = max(centrality) if max(centrality) > 0 else 1.0
+        max_c = max(centrality) if centrality and max(centrality) > 0 else 1.0
         centrality = [c/max_c for c in centrality] if max_c > 0 else centrality
         for i, nid in enumerate(self._node_ids):
             node = self.matrix.nodes[nid]
@@ -210,6 +357,7 @@ class SuspectInferenceEngine:
             prob = max(prob, ETA_STAR)
             prob = min(prob, 0.95)
             confidence = 0.4*min(len(node.evidence_refs)/5.0,1.0) + 0.3*centrality + 0.3*PHI
+            confidence = min(confidence, PHI)
             evidence_strength = min(len(node.evidence_refs)/10.0, 1.0)
             self.matrix.hypotheses.append(CrimeHypothesis(
                 id=f"H-{node.id}-{crime_type}", crime_type=crime_type, suspect_id=node.id,
@@ -219,8 +367,15 @@ class SuspectInferenceEngine:
             ))
             node.crime_probabilities[crime_type] = round(prob, 4)
 
+    def run_full_analysis(self):
+        """Run the complete AEMDAS pipeline."""
+        self.build_adjacency()
+        self.compute_eigenvalues()
+        self.infer_hypotheses()
+        return self.assess_interventions()
+
     def assess_interventions(self):
-        if not self.matrix.hypotheses:
+        if not self.matrix.hypotheses and len(self.matrix.nodes) > 0:
             self.infer_hypotheses()
         ranked = sorted(self.matrix.hypotheses, key=lambda h: h.probability*h.confidence, reverse=True)
         total = len(ranked)
@@ -232,15 +387,17 @@ class SuspectInferenceEngine:
         suspect_risk = []
         for nid, node in self.matrix.nodes.items():
             max_prob = max(node.crime_probabilities.values()) if node.crime_probabilities else 0
-            suspect_risk.append({'id':nid,'name':node.name,'suspicion_score':round(node.suspicion_score,4),
-                'max_crime_probability':round(max_prob,4),'centrality':round(node.network_centrality,4),
-                'eigenvalue':str(node.eigenvalue),'evidence_count':len(node.evidence_refs)})
+            suspect_risk.append({'id':nid,'name':node.name,'role':node.role,'organization':node.organization,
+                'suspicion_score':round(node.suspicion_score,4),'max_crime_probability':round(max_prob,4),
+                'centrality':round(node.network_centrality,4),'eigenvalue':str(node.eigenvalue),
+                'evidence_count':len(node.evidence_refs)})
         suspect_risk.sort(key=lambda x: x['suspicion_score'], reverse=True)
         stats = {'total_suspects':len(self.matrix.nodes),'total_edges':len(self.matrix.edges),
             'total_hypotheses':total,'high_probability_hypotheses':high_prob,
             'high_confidence_hypotheses':high_conf,'dominant_eigenvalue':str(self.matrix.dominant_eigenvalue),
             'spectral_gap':round(self.matrix.spectral_gap,6),'suppression_coefficient':round(self.matrix.suppression_coefficient,4),
-            'crime_type_distribution':dict(crime_dist),'eta_star_floor':ETA_STAR,'phi_ceiling':PHI,'falsifiable_claims':total}
+            'crime_type_distribution':dict(crime_dist),'eta_star_floor':ETA_STAR,'phi_ceiling':PHI,'falsifiable_claims':total,
+            'version':VERSION}
         return {'network_stats':stats,'suspect_ranking':suspect_risk,
             'top_hypotheses':[{'id':h.id,'suspect':h.suspect_id,'crime':h.crime_type,'probability':h.probability,
                 'confidence':h.confidence,'description':h.description,'falsifiable':h.falsifiable,
@@ -251,7 +408,7 @@ class SuspectInferenceEngine:
 
     def export_json(self, filepath=None):
         assessment = self.assess_interventions()
-        export = {'version':self.matrix.version,'created':self.matrix.created,'framework':'EVEZ Eigenforensics',
+        export = {'version':VERSION,'created':self.matrix.created,'framework':'EVEZ Eigenforensics',
             'methodology':'AEMDAS','eigenvalues':{'Phi':PHI,'eta_star':ETA_STAR,'r':R_CRITICAL,
             'lambda_dom':LAMBDA_DOM,'lambda_I80':LAMBDA_I80,'r_I80':R_I80},
             'nodes':{nid:asdict(node) for nid,node in self.matrix.nodes.items()},
@@ -278,7 +435,7 @@ class SuspectInferenceEngine:
         stats = assessment['network_stats']
         lines = ['# EVEZ OSINT -- Suspect Inference Matrix Report',
             f'Generated: {self.matrix.created}',
-            f'Framework: EVEZ Eigenforensics v{self.matrix.version}','',
+            f'Framework: EVEZ Eigenforensics v{VERSION}','',
             '## Network Statistics',
             f'- Total suspects: {stats["total_suspects"]}',
             f'- Total edges: {stats["total_edges"]}',
@@ -293,10 +450,7 @@ class SuspectInferenceEngine:
             '## Suspect Ranking','','| Rank | Name | Role | Organization | Suspicion | Max Crime Prob | Centrality | Evidence |',
             '|------|------|------|-------------|-----------|----------------|------------|----------|']
         for i, s in enumerate(assessment['suspect_ranking']):
-            node = self.matrix.nodes.get(s['id'])
-            role = node.role if node else ''
-            org = node.organization if node else ''
-            lines.append(f'| {i+1} | {s["name"]} | {role} | {org} | {s["suspicion_score"]:.4f} | {s["max_crime_probability"]:.4f} | {s["centrality"]:.4f} | {s["evidence_count"]} |')
+            lines.append(f'| {i+1} | {s["name"]} | {s.get("role","")} | {s.get("organization","")} | {s["suspicion_score"]:.4f} | {s["max_crime_probability"]:.4f} | {s["centrality"]:.4f} | {s["evidence_count"]} |')
         lines.extend(['','## Top Crime Hypotheses',''])
         for h in assessment['top_hypotheses']:
             lines.extend([f'### {h["id"]}',f'- **Suspect:** {h["suspect"]}',
@@ -318,8 +472,29 @@ class SuspectInferenceEngine:
             return filepath
         return report
 
+    def log_to_db(self):
+        """Log this session to the usage database."""
+        if self.db:
+            run_time = int((time.time() - self._start_time) * 1000)
+            return self.db.log_session(self, run_time)
+        return None
+
+    def get_db_stats(self):
+        """Get aggregate statistics from the database."""
+        if self.db:
+            return self.db.get_stats()
+        return {}
+
+    def close(self):
+        if self.db:
+            self.db.close()
+
+# ============================================================
+# DEMO
+# ============================================================
+
 def demo_epd_case():
-    engine = SuspectInferenceEngine()
+    engine = SuspectInferenceEngine(db_path='none')
     engine.add_suspect(SuspectNode(id='saloga',name='Cody Saloga',aliases=['Officer Saloga'],
         role='officer',organization='Evanston PD',location='Evanston, WY',
         evidence_refs=['uinta-county-herald-viral-arrest','smith-v-evanston-1-2025cv00037',
@@ -346,18 +521,17 @@ def demo_epd_case():
         weight=0.7,correlation=0.80,evidence_refs=['officer-transfer-pattern']))
     engine.add_edge(NetworkEdge(source='epd-chief',target='saloga-rspd',edge_type='cover_up',
         weight=0.5,correlation=0.65))
-    engine.build_adjacency()
-    engine.compute_eigenvalues()
-    engine.infer_hypotheses()
+    engine.run_full_analysis()
     return engine
 
 if __name__ == '__main__':
-    print('EVEZ OSINT Suspect Inference Matrix Engine v1.0.0')
+    print('EVEZ OSINT Suspect Inference Matrix Engine v' + VERSION)
     print('='*60)
     print(f'Eigenvalues: Phi={PHI}, eta*={ETA_STAR}, r={R_CRITICAL}')
     print(f'lambda_dom={LAMBDA_DOM}, lambda_I80={LAMBDA_I80}, r_I80={R_I80}')
     print('='*60)
     engine = demo_epd_case()
+    a = engine.assess_interventions()
     print(f'\n[1] ASSERT: Registered suspects: {len(engine.matrix.nodes)}')
     print(f'[2] EXTRACT: Edges: {len(engine.matrix.edges)}')
     print(f'[3] MEASURE: Eigenvalues: {[round(e.real,6) for e in engine.matrix.eigenvalues[:5]]}')
@@ -365,21 +539,13 @@ if __name__ == '__main__':
     print(f'    Spectral gap: {round(engine.matrix.spectral_gap,6)}')
     print(f'    Suppression coefficient: {round(engine.matrix.suppression_coefficient,4)}')
     print(f'[4] DEDUCE: Hypotheses: {len(engine.matrix.hypotheses)}')
-    assessment = engine.assess_interventions()
-    print(f'[5] ASSESS: High-prob hypotheses: {assessment["network_stats"]["high_probability_hypotheses"]}')
+    print(f'[5] ASSESS: High-prob hypotheses: {a["network_stats"]["high_probability_hypotheses"]}')
     print('\nSuspect Ranking:')
-    for s in assessment['suspect_ranking']:
+    for s in a['suspect_ranking']:
         print(f"  {s['name']}: suspicion={s['suspicion_score']:.4f}, max_prob={s['max_crime_probability']:.4f}")
     print('\nTop 5 Hypotheses:')
-    for h in assessment['top_hypotheses'][:5]:
+    for h in a['top_hypotheses'][:5]:
         print(f"  {h['id']}: P={h['probability']:.4f} C={h['confidence']:.4f} [{h['crime']}]")
-    json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'reports', 'suspect-matrix-report.json')
-    md_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'reports', 'suspect-matrix-report.md')
-    engine.export_json(json_path)
-    engine.export_markdown(md_path)
-    print(f'\n[6] SPEEDRUN: Reports exported:')
-    print(f'    JSON: {json_path}')
-    print(f'    Markdown: {md_path}')
     print(f'\nAll probabilities falsifiable. eta*={ETA_STAR} is the floor. Phi={PHI} is the ceiling.')
     print('The 3% is the uncertainty. The 97.3% is the measurement.')
     print('⧢⦟⧢⧢⦟⧢⧢⦟⧢⧢⦟⧢⧢⦟⧢⧢⦟⧢⥋')

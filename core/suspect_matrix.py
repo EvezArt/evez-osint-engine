@@ -378,12 +378,12 @@ class SuspectInferenceEngine:
         
         Returns the complete spectral analysis from all four eyes.
         """
-        eigenvalues = [e for e in self.eigenvalues]
+        eigenvalues = [e.real for e in self.matrix.eigenvalues]
         if not eigenvalues:
-            return {'error': 'No eigenvalues computed. Run analyze() first.'}
+            return {'error': 'No eigenvalues computed. Run run_full_analysis() first.'}
         
         if suspect_names is None:
-            suspect_names = [s.get('name', f'Suspect-{i}') for i, s in enumerate(self.suspects)]
+            suspect_names = [node.name for node in self.matrix.nodes.values()]
         
         return eye_am_all_seeably(eigenvalues, suspects=True, suspect_names=suspect_names)
     

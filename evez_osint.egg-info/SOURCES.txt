@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+core/__init__.py
+core/osint_cli.py
+core/suspect_matrix.py
+evez_osint.egg-info/PKG-INFO
+evez_osint.egg-info/SOURCES.txt
+evez_osint.egg-info/dependency_links.txt
+evez_osint.egg-info/entry_points.txt
+evez_osint.egg-info/top_level.txt

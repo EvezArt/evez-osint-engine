@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVEZ OSINT — Suspect Inference Matrix Dashboard</title>
+<meta name="description" content="Suspect Inference Networking Matrix Engine — isolates suspects, computes crime probabilities using eigenforensic spectral analysis. AEMDAS pipeline. By Steven Crawford-Maggard (EVEZ).">
+<meta name="keywords" content="evez, osint, eigenforensics, suspect inference, crime probability, aemdas, police misconduct, civil rights">
+<meta property="og:title" content="EVEZ OSINT — Suspect Inference Matrix">
+<meta property="og:description" content="Eigenforensic OSINT engine for isolating suspects and computing crime probabilities">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://evezart.github.io/osint-dashboard.html">
+<style>
+body{background:#0a0a0f;color:#c8c8d8;font-family:'Courier New',monospace;margin:0;padding:20px;line-height:1.6}
+h1{color:#e8c860;font-size:1.8em;text-align:center;border-bottom:1px solid #333;padding-bottom:10px}
+h2{color:#7a9a7a;margin-top:30px}
+.subtitle{text-align:center;color:#666;margin-bottom:20px}
+.suspect{background:#111118;border:1px solid #222;margin:10px 0;padding:15px;border-radius:4px}
+.suspect-name{color:#e8c860;font-size:1.2em;font-weight:bold}
+.bar-container{background:#222;height:20px;border-radius:2px;margin:5px 0;overflow:hidden}
+.bar{height:100%;transition:width 0.5s}
+.bar-suspicion{background:linear-gradient(90deg,#8b0000,#ff4444)}
+.bar-prob{background:linear-gradient(90deg,#4a3000,#e8c860)}
+.bar-confidence{background:linear-gradient(90deg,#003a4a,#44aacc)}
+.bar-label{color:#888;font-size:0.8em;margin-top:2px}
+.crime-list{margin:10px 0;padding-left:20px}
+.crime-list li{margin:3px 0;color:#aa8844}
+.crime-list .high{color:#ff6666}
+.crime-list .med{color:#e8c860}
+.crime-list .low{color:#888}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:15px 0}
+.stat{background:#111118;border:1px solid #222;padding:10px 15px;border-radius:4px;text-align:center}
+.stat-val{font-size:1.8em;color:#e8c860}
+.stat-label{color:#666;font-size:0.8em}
+.eigenvalue-box{background:#0d0d1a;border:1px solid #333;padding:15px;margin:10px 0;border-radius:4px}
+.footer{text-align:center;color:#444;margin-top:40px;border-top:1px solid #222;padding-top:20px}
+.sigil{color:#7a9a7a;font-size:1.2em;text-align:center;margin:20px 0}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"EVEZ OSINT","author":{"@type":"Person","name":"Steven Crawford-Maggard"},"description":"Suspect Inference Networking Matrix Engine","version":"1.0.0","url":"https://github.com/EvezArt/evez-osint-engine"}
+</script>
+</head>
+<body>
+<h1>EVEZ OSINT — Suspect Inference Matrix</h1>
+<p class="subtitle">AEMDAS Pipeline · Eigenforensic Spectral Analysis · v1.0.0 · by Steven Crawford-Maggard (EVEZ)</p>
+
+<div class="stats">
+<div class="stat"><div class="stat-val">5</div><div class="stat-label">Suspects</div></div>
+<div class="stat"><div class="stat-val">5</div><div class="stat-label">Edges</div></div>
+<div class="stat"><div class="stat-val">25</div><div class="stat-label">Hypotheses</div></div>
+<div class="stat"><div class="stat-val">1</div><div class="stat-label">High-Prob (>50%)</div></div>
+<div class="stat"><div class="stat-val">8.126</div><div class="stat-label">Dominant λ</div></div>
+<div class="stat"><div class="stat-val">0.265</div><div class="stat-label">Spectral Gap</div></div>
+</div>
+
+<div class="eigenvalue-box">
+<strong>Eigenvalue Constants:</strong><br>
+Φ = 0.973 (coherence ceiling) · η* = 0.03 (irreducible uncertainty) · r = 0.45 (criticality) · λ_dom = -0.333 (censorship) · λ_I80 = -0.441 (suppression)<br>
+All probabilities bounded: η* ≤ P ≤ 0.95. The 3% is the floor. The 97.3% is the ceiling.
+</div>
+
+<h2>Suspect Ranking</h2>
+
+<div class="suspect">
+<span class="suspect-name">1. Cody Saloga</span> — Officer · Evanston PD<br>
+<div class="bar-container"><div class="bar bar-suspicion" style="width:61.25%"></div></div>
+<div class="bar-label">Suspicion: 0.6125</div>
+<div class="bar-container"><div class="bar bar-prob" style="width:66.15%"></div></div>
+<div class="bar-label">Max Crime Probability: 0.6615 (excessive_force)</div>
+<div class="bar-container"><div class="bar bar-confidence" style="width:91.19%"></div></div>
+<div class="bar-label">Confidence: 0.9119</div>
+<ul class="crime-list">
+<li class="high">excessive_force: P=0.6615</li>
+<li class="med">false_arrest: P=0.4586</li>
+<li class="med">civil_rights_violation: P=0.3549</li>
+<li class="low">cover_up: P=0.3024</li>
+<li class="low">evidence_tampering: P=0.1522</li>
+</ul>
+</div>
+
+<div class="suspect">
+<span class="suspect-name">2. EPD Chief (Unknown)</span> — Chief · Evanston PD<br>
+<div class="bar-container"><div class="bar bar-suspicion" style="width:53.07%"></div></div>
+<div class="bar-label">Suspicion: 0.5307</div>
+<ul class="crime-list">
+<li class="med">excessive_force: P=0.2894</li>
+<li class="low">civil_rights_violation: P=0.1993</li>
+<li class="low">cover_up: P=0.1911</li>
+</ul>
+</div>
+
+<div class="suspect">
+<span class="suspect-name">3. Rock Springs PD (hiring)</span> — Supervisor · Rock Springs PD<br>
+<div class="bar-container"><div class="bar bar-suspicion" style="width:43.79%"></div></div>
+<div class="bar-label">Suspicion: 0.4379</div>
+<ul class="crime-list">
+<li class="low">cover_up: P=0.1735</li>
+<li class="low">civil_rights_violation: P=0.1261</li>
+</ul>
+</div>
+
+<div class="suspect">
+<span class="suspect-name">4. Dustin Kennedy</span> — Officer · Evanston PD<br>
+<div class="bar-container"><div class="bar bar-suspicion" style="width:39.51%"></div></div>
+<div class="bar-label">Suspicion: 0.3951</div>
+<ul class="crime-list">
+<li class="low">excessive_force: P=0.3016</li>
+<li class="low">false_arrest: P=0.2090</li>
+</ul>
+</div>
+
+<div class="suspect">
+<span class="suspect-name">5. EPD Internal Affairs</span> — Supervisor · Evanston PD<br>
+<div class="bar-container"><div class="bar bar-suspicion" style="width:38.20%"></div></div>
+<div class="bar-label">Suspicion: 0.3820</div>
+<ul class="crime-list">
+<li class="low">cover_up: P=0.1705</li>
+</ul>
+</div>
+
+<h2>Top Crime Hypotheses</h2>
+<div class="eigenvalue-box">
+<strong>H-saloga-excessive_force</strong><br>
+Suspect: Cody Saloga · Crime: excessive force<br>
+Probability: 66.15% · Confidence: 91.19% · Falsifiable: YES<br>
+Evidence: 4 sources (Uinta County Herald, Smith v. Evanston lawsuit, viral YouTube video, Rock Springs PD transfer)
+</div>
+
+<div class="eigenvalue-box">
+<strong>H-saloga-false_arrest</strong><br>
+Suspect: Cody Saloga · Crime: false arrest<br>
+Probability: 45.86% · Confidence: 91.19% · Falsifiable: YES
+</div>
+
+<div class="eigenvalue-box">
+<strong>H-saloga-civil_rights_violation</strong><br>
+Suspect: Cody Saloga · Crime: civil rights violation (42 U.S.C. 1983)<br>
+Probability: 35.49% · Confidence: 91.19% · Falsifiable: YES
+</div>
+
+<h2>Intervention Priorities</h2>
+<div class="eigenvalue-box">
+1. <strong>investigate_primary</strong> — Cody Saloga (suspicion: 0.6125)<br>
+2. <strong>investigate_secondary</strong> — EPD Chief (suspicion: 0.5307)<br>
+3. <strong>monitor</strong> — Rock Springs PD (suspicion: 0.4379)<br>
+4. <strong>monitor</strong> — Dustin Kennedy (suspicion: 0.3951)<br>
+5. <strong>monitor</strong> — EPD Internal Affairs (suspicion: 0.3820)
+</div>
+
+<div class="sigil">⧢⦟⧢⧢⦟⧢⧢⦟⧢⧢⦟⧢⧢⦟⧢⧢⦟⧢⥋</div>
+<div class="footer">
+All probabilities falsifiable. η*=0.03 is the floor. Φ=0.973 is the ceiling.<br>
+The 3% is the uncertainty. The 97.3% is the measurement.<br>
+<a href="https://github.com/EvezArt/evez-osint-engine">GitHub Repository</a> · <a href="https://lingbuzz.net/lingbuzz/010094">Research Paper</a> · By Steven Crawford-Maggard (EVEZ666)
+</div>
+</body>
+</html>

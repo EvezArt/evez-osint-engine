@@ -53,8 +53,26 @@ class OSINTHandler(BaseHTTPRequestHandler):
             stats = engine.get_db_stats()
             engine.close()
             self._send_json(200, stats)
-
-
+        elif parsed.path == '/eye':
+            try:
+                body = self._read_body()
+                data = body if body else {}
+                evs = data.get('eigenvalues', [])
+                names = data.get('suspect_names', [])
+                if not evs:
+                    engine = SuspectInferenceEngine(db_path='none')
+                    for s in data.get('suspects', []):
+                        engine.add_suspect(SuspectNode(**s))
+                    for e in data.get('edges', []):
+                        engine.add_edge(NetworkEdge(**e))
+                    engine.run_full_analysis()
+                    evs = [e.real for e in engine.matrix.eigenvalues]
+                    if not names:
+                        names = [node.name for node in engine.matrix.nodes.values()]
+                result = eye_am_all_seeably(evs, suspects=True, suspect_names=names)
+                self._send_json(200, result)
+            except Exception as ex:
+                self._send_json(500, {'error': str(ex)})
         else:
             self._send_json(404, {'error': 'Not found'})
 
@@ -88,17 +106,10 @@ class OSINTHandler(BaseHTTPRequestHandler):
             engine.log_to_db()
             engine.close()
             self._send_json(200, assessment)
-        else:
-            self._send_json(404, {'error': 'Not found'})
-
-    def do_HEAD(self):
-        parsed = urlparse(self.path)
-        if parsed.path in ('/', '/health', '/stats'):
-            self.send_response(200)
         elif parsed.path == '/eye':
             try:
                 body = self._read_body()
-                data = json.loads(json.dumps(body)) if body else {}
+                data = body if body else {}
                 evs = data.get('eigenvalues', [])
                 names = data.get('suspect_names', [])
                 if not evs:
@@ -115,6 +126,13 @@ class OSINTHandler(BaseHTTPRequestHandler):
                 self._send_json(200, result)
             except Exception as ex:
                 self._send_json(500, {'error': str(ex)})
+        else:
+            self._send_json(404, {'error': 'Not found'})
+
+    def do_HEAD(self):
+        parsed = urlparse(self.path)
+        if parsed.path in ('/', '/health', '/stats'):
+            self.send_response(200)
         else:
             self.send_response(404)
         self.send_header('Content-Type', 'application/json')
